@@ -48,9 +48,26 @@ def is_content_empty(content: str) -> bool:
     # Check if there's any meaningful content left
     return not cleaned or cleaned.isspace()
 
+def get_unique_filename(base_filename: str, used_filenames: set) -> str:
+    """Generate a unique filename by adding a counter if needed"""
+    if base_filename not in used_filenames:
+        return base_filename
+
+    # Split filename and extension
+    name, ext = os.path.splitext(base_filename)
+    counter = 1
+
+    # Keep trying until we find an unused name
+    while True:
+        new_name = f"{name}_{counter}{ext}"
+        if new_name not in used_filenames:
+            return new_name
+        counter += 1
+
 def process_xml(file):
     txt_files = []
     concatenated_content = ""
+    used_filenames = set()  # Track used filenames
 
     try:
         cleanup_output()
@@ -88,20 +105,24 @@ def process_xml(file):
                 st.warning(f"Skipping empty content: {title}")
                 continue
 
-            # Sanitize title
+            # Sanitize title and ensure unique filename
             sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
             if not sanitized_title:
                 sanitized_title = f"untitled_{i}"
 
-            # Save non-empty files to output directory
-            filename = os.path.join(OUTPUT_DIR, f"{sanitized_title}.md")
-            with open(filename, "w", encoding="utf-8") as f:
+            base_filename = f"{sanitized_title}.md"
+            unique_filename = get_unique_filename(base_filename, used_filenames)
+            used_filenames.add(unique_filename)
+
+            # Save non-empty files to output directory with unique name
+            filepath = os.path.join(OUTPUT_DIR, unique_filename)
+            with open(filepath, "w", encoding="utf-8") as f:
                 f.write(markdown_content)
 
-            txt_files.append(filename)
+            txt_files.append(filepath)
             processed_count += 1
 
-            # Only concatenate non-empty content
+            # Use original title for concatenated content
             concatenated_content += f"\n\n# {title}\n\n{markdown_content}"
 
         except Exception as e:
