@@ -30,7 +30,7 @@ def process_xml(file):
             content = item.find('content:encoded', namespaces).text
             if content is None:
                 # Skip items with no content
-                st.warning(f"Skipping item {i}: Content is None")
+                # st.warning(f"Skipping item {i}: Content is None")
                 continue
 
             # Convert HTML to Markdown using markdownify
