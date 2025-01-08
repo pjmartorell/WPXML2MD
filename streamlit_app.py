@@ -16,8 +16,8 @@ def process_xml(file):
 
     # Extract posts/pages
     for item in root.findall('.//item'):
-        title = item.find('title').text
-        content = item.find('content:encoded', namespaces).text
+        title = item.find('title').text if item.find('title') is not None else "untitled"
+        content = item.find('content:encoded', namespaces).text if item.find('content:encoded', namespaces) is not None else ""
 
         # Sanitize the title for file naming
         sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
