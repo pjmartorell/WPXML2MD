@@ -7,8 +7,9 @@ Convert your WordPress export XML files to clean Markdown files with ease!
 ## ✨ Features
 
 - Simple and intuitive web interface
-- Upload WordPress XML export files
+- Upload multiple WordPress XML export files at once
 - Convert posts and pages to Markdown format
+- Option to combine all content into a single file
 - Preserve metadata and content structure
 - Download converted files instantly
 
@@ -32,10 +33,10 @@ Try it now at [wpxml2md.streamlit.app](https://wpxml2md.streamlit.app/)
 
 1. Export your content from WordPress (Tools → Export)
 2. Visit the converter app
-3. Upload your XML file
-4. Download your converted Markdown files
+3. Upload one or more XML files
+4. Choose to combine files or keep them separate
+5. Download your converted Markdown files
 
 ## 💝 Support the Project
 
 If you find this tool useful, consider [sponsoring the project](https://github.com/sponsors/pjmartorell) to support its development.
-
