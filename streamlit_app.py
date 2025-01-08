@@ -37,9 +37,10 @@ def process_xml(uploaded_file, concatenate=False):
             txt_files.append(filename)
 
     if concatenate:
-        with open("all_pages.md", "w", encoding="utf-8") as f:
+        concatenated_filename = "all_pages.md"
+        with open(concatenated_filename, "w", encoding="utf-8") as f:
             f.write(concatenated_content)
-        txt_files.append("all_pages.md")
+        txt_files.append(concatenated_filename)
 
     return txt_files
 
