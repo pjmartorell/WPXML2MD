@@ -6,25 +6,72 @@ import shutil
 import unicodedata
 from markdownify import markdownify as md
 
-# Set page config
+# Set wider layout
 st.set_page_config(
     page_title="WordPress XML to Markdown",
     page_icon="📝",
-    layout="centered"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# Title and description
+# Sidebar with instructions and settings
+with st.sidebar:
+    st.title("⚙️ Settings & Help")
+
+    with st.expander("📖 How to Use", expanded=True):
+        st.markdown("""
+        1. Export your content from WordPress (Tools → Export)
+        2. Upload your XML file(s) below
+        3. Configure conversion options
+        4. Click Process and download results
+        """)
+
+    with st.expander("🛠️ Advanced Options"):
+        st.markdown("### Conversion Settings")
+        heading_style = st.selectbox(
+            "Heading Style",
+            ["ATX (#)", "Setext (===)"],
+            help="Choose the style for markdown headings"
+        )
+
+        preserve_linebreaks = st.checkbox(
+            "Preserve Line Breaks",
+            value=True,
+            help="Keep original line breaks from WordPress"
+        )
+
+        remove_empty = st.checkbox(
+            "Skip Empty Posts",
+            value=True,
+            help="Skip posts with no meaningful content"
+        )
+
+# Main content area
 st.title("📝 WordPress XML to Markdown")
 st.markdown("Convert your WordPress export XML files to clean Markdown files with ease!")
 
-# Instructions
-with st.expander("ℹ️ How to use"):
-    st.markdown("""
-    1. Export your content from WordPress (Tools → Export)
-    2. Upload one or more XML files using the uploader below
-    3. Choose whether you want individual files or a single combined file
-    4. Download your converted Markdown files
-    """)
+# Create two columns for upload and options
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    st.subheader("1️⃣ Upload Files")
+    uploaded_files = st.file_uploader(
+        "Drop your WordPress XML export file(s) here",
+        type=["xml"],
+        accept_multiple_files=True,
+        help="You can upload multiple XML files at once"
+    )
+
+    if uploaded_files:
+        st.success(f"✅ {len(uploaded_files)} file(s) uploaded")
+
+with col2:
+    st.subheader("2️⃣ Output Format")
+    concatenate_files = st.radio(
+        "Choose output format",
+        ["Individual Markdown Files", "Single Combined File"],
+        help="Choose how you want your posts to be organized"
+    )
 
 # Create output directory if it doesn't exist
 OUTPUT_DIR = "output"
@@ -75,7 +122,7 @@ def sanitize_filename(filename: str) -> str:
     sanitized = ''.join(c for c in ascii_text if c.isalnum() or c in (' ', '-', '_', '.'))
     return sanitized.strip()
 
-def process_xml(file):
+def process_xml(file, heading_style="ATX", preserve_linebreaks=True, remove_empty=True):
     txt_files = []
     concatenated_content = ""
     used_filenames = set()  # Track used filenames
@@ -86,7 +133,7 @@ def process_xml(file):
         root = tree.getroot()
     except Exception as e:
         st.error(f"Error parsing XML: {e}")
-        return [], ""
+        return [], "", 0, 0
 
     # Add counter for processed files
     processed_count = 0
@@ -108,10 +155,10 @@ def process_xml(file):
                 continue
 
             # Convert HTML to Markdown using markdownify
-            markdown_content = md(content, heading_style="ATX")
+            markdown_content = md(content, heading_style=heading_style)
 
             # Enhanced empty content check
-            if is_content_empty(markdown_content):
+            if remove_empty and is_content_empty(markdown_content):
                 skipped_count += 1
                 st.warning(f"Skipping empty content: {title}")
                 continue
@@ -147,70 +194,104 @@ def process_xml(file):
         st.info(f"Successfully processed {processed_count} files" +
                 (f" (skipped {skipped_count} empty files)" if skipped_count > 0 else ""))
 
-    return txt_files, concatenated_content
+    return txt_files, concatenated_content, processed_count, skipped_count
 
-# Main converter section
-st.subheader("1️⃣ Upload Your WordPress XML")
-uploaded_files = st.file_uploader("Choose your WordPress XML export file(s)", type=["xml"], accept_multiple_files=True)
+def generate_and_offer_download(txt_files, concatenated_content, is_single_file):
+    """Generate zip file and create download button"""
+    zip_path = os.path.join(OUTPUT_DIR, "markdown_output.zip")
 
-if uploaded_files:
-    # Conversion Options
-    st.subheader("2️⃣ Select Conversion Options")
-    concatenate_files = st.checkbox(
-        "Combine all posts into a single Markdown file",
-        help="If checked, all posts from all XML files will be combined into one file. Otherwise, each post will be in a separate file."
-    )
-
-    # Process button
-    st.subheader("3️⃣ Convert")
-    if st.button("🔄 Process XML Files"):
-        all_txt_files = []
-        all_concatenated_content = ""
-        total_processed = 0
-        total_skipped = 0
-
-        progress_bar = st.progress(0)
-        for idx, xml_file in enumerate(uploaded_files):
-            try:
-                st.write(f"Processing {xml_file.name}...")
-                txt_files, concatenated_content = process_xml(xml_file)
-                all_txt_files.extend(txt_files)
-                all_concatenated_content += concatenated_content
-                progress_bar.progress((idx + 1) / len(uploaded_files))
-            except Exception as e:
-                st.error(f"Error processing {xml_file.name}: {str(e)}")
-
-        if all_txt_files or all_concatenated_content:
-            st.success("✅ Conversion completed successfully!")
-
-            # Create zip file
-            zip_path = os.path.join(OUTPUT_DIR, "markdown_output.zip")
-            with zipfile.ZipFile(zip_path, "w") as zipf:
-                if concatenate_files:
-                    if all_concatenated_content:
-                        concatenated_filename = os.path.join(OUTPUT_DIR, "concatenated_markdown.md")
-                        with open(concatenated_filename, "w", encoding="utf-8") as f:
-                            f.write(all_concatenated_content)
-                        # Use absolute path and sanitized basename
-                        zipf.write(concatenated_filename, "concatenated_markdown.md")
-                else:
-                    for txt_file in all_txt_files:
-                        if os.path.exists(txt_file):  # Verify file exists
-                            # Use sanitized basename for zip entry
-                            safe_name = sanitize_filename(os.path.basename(txt_file))
-                            zipf.write(txt_file, safe_name)
-
-            # Download button
-            st.subheader("4️⃣ Download")
-            with open(zip_path, "rb") as f:
-                st.download_button(
-                    label="⬇️ Download Converted Files",
-                    data=f,
-                    file_name="markdown_output.zip",
-                    mime="application/zip"
-                )
+    with zipfile.ZipFile(zip_path, "w") as zipf:
+        if is_single_file:
+            if concatenated_content:
+                concatenated_filename = os.path.join(OUTPUT_DIR, "concatenated_markdown.md")
+                with open(concatenated_filename, "w", encoding="utf-8") as f:
+                    f.write(concatenated_content)
+                zipf.write(concatenated_filename, "concatenated_markdown.md")
         else:
-            st.warning("No content found to convert in any of the XML files.")
+            for txt_file in txt_files:
+                if os.path.exists(txt_file):
+                    safe_name = sanitize_filename(os.path.basename(txt_file))
+                    zipf.write(txt_file, safe_name)
+
+    # Create download button
+    with open(zip_path, "rb") as f:
+        st.download_button(
+            label="⬇️ Download Converted Files",
+            data=f,
+            file_name="markdown_output.zip",
+            mime="application/zip"
+        )
+
+# Process section
+if uploaded_files:
+    st.subheader("3️⃣ Process Files")
+
+    # Stats containers
+    stats_col1, stats_col2, stats_col3 = st.columns(3)
+    with stats_col1:
+        files_counter = st.empty()
+    with stats_col2:
+        progress_counter = st.empty()
+    with stats_col3:
+        time_counter = st.empty()
+
+    if st.button("🔄 Convert to Markdown", use_container_width=True):
+        try:
+            all_txt_files = []
+            all_concatenated_content = ""
+            total_processed = 0
+            total_skipped = 0
+
+            # Main progress bar
+            progress_text = "Overall Progress"
+            main_progress_bar = st.progress(0, text=progress_text)
+
+            for idx, xml_file in enumerate(uploaded_files):
+                try:
+                    with st.status(f"Processing {xml_file.name}...", expanded=True) as status:
+                        txt_files, concatenated_content, processed, skipped = process_xml(
+                            xml_file,
+                            heading_style="ATX" if heading_style == "ATX (#)" else "SETEXT",
+                            preserve_linebreaks=preserve_linebreaks,
+                            remove_empty=remove_empty
+                        )
+
+                        all_txt_files.extend(txt_files)
+                        all_concatenated_content += concatenated_content
+                        total_processed += processed
+                        total_skipped += skipped
+                        main_progress_bar.progress((idx + 1) / len(uploaded_files))
+                        status.update(label=f"✅ Completed {xml_file.name}", state="complete")
+
+                except Exception as e:
+                    st.error(f"Error processing {xml_file.name}: {str(e)}")
+
+            if all_txt_files or all_concatenated_content:
+                st.success("🎉 Conversion completed successfully!")
+
+                # Download section
+                st.subheader("4️⃣ Download Results")
+
+                # Create download options
+                download_col1, download_col2 = st.columns(2)
+                with download_col1:
+                    # Create and offer zip download
+                    generate_and_offer_download(
+                        all_txt_files,
+                        all_concatenated_content,
+                        concatenate_files == "Single Combined File"
+                    )
+                with download_col2:
+                    st.info("📊 Conversion Summary\n"
+                           f"- Files Processed: {len(uploaded_files)}\n"
+                           f"- Posts Converted: {total_processed}\n"
+                           f"- Posts Skipped: {total_skipped}")
+            else:
+                st.warning("⚠️ No content found to convert in the XML files.")
+
+        except Exception as e:
+            st.error(f"❌ Error during conversion: {str(e)}")
+            st.info("Please make sure you've uploaded valid WordPress XML export files.")
 
 # Footer
 st.markdown("---")
