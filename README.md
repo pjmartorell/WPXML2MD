@@ -35,6 +35,7 @@ Try it now at [wpxml2md.streamlit.app](https://wpxml2md.streamlit.app/)
 3. Upload your XML file
 4. Download your converted Markdown files
 
-## 📄 License
+## 💝 Support the Project
 
-MIT License
+If you find this tool useful, consider [sponsoring the project](https://github.com/sponsors/pjmartorell) to support its development.
+
