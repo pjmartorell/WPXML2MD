@@ -3,7 +3,6 @@ import xml.etree.ElementTree as ET
 import zipfile
 import os
 
-# Function to process the XML file
 def process_xml(file):
     txt_files = []
 
@@ -48,33 +47,35 @@ def process_xml(file):
 
     return txt_files
 
-# Streamlit App
-st.title("WordPress XML to TXT Converter")
-st.write("Upload your WordPress XML file to extract text from posts and pages into `.txt` files.")
+# Streamlit UI
+st.title("XML to TXT Converter")
 
-# File uploader
-uploaded_file = st.file_uploader("Upload XML File", type=["xml"])
+uploaded_file = st.file_uploader("Upload an XML file", type=["xml"])
 
 if uploaded_file is not None:
-    # Process XML file when the user uploads it
-    with st.spinner("Processing XML file..."):
-        txt_files = process_xml(uploaded_file)
+    txt_files = process_xml(uploaded_file)
 
-    # Create a zip archive of the .txt files
-    with zipfile.ZipFile("output.zip", "w") as zipf:
-        for txt_file in txt_files:
-            try:
-                # Ensure the file exists before adding it to the zip
-                if os.path.exists(txt_file):
+    if txt_files:
+        # Create a zip archive of the .txt files
+        with zipfile.ZipFile("output.zip", "w") as zipf:
+            for txt_file in txt_files:
+                if os.path.exists(txt_file):  # Check if the file exists
                     zipf.write(txt_file)
-                    os.remove(txt_file)  # Clean up individual .txt files after zipping
                 else:
                     st.warning(f"File not found: {txt_file}")
-            except Exception as e:
-                st.error(f"Error adding file to zip: {txt_file}. Error: {e}")
 
-    # Download button for the zip archive
-    with open("output.zip", "rb") as f:
-        st.download_button("Download TXT Files", f, file_name="output.zip")
+        # Clean up individual .txt files after zipping
+        for txt_file in txt_files:
+            if os.path.exists(txt_file):
+                os.remove(txt_file)
 
-    st.success("Conversion completed!")
+        # Provide download link
+        with open("output.zip", "rb") as f:
+            st.download_button(
+                label="Download ZIP file",
+                data=f,
+                file_name="output.zip",
+                mime="application/zip"
+            )
+ 
+        st.success("Conversion completed!")
