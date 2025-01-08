@@ -19,33 +19,30 @@ def process_xml(file):
         'content': 'http://purl.org/rss/1.0/modules/content/'
     }
 
-    # Extract posts/pages
     for i, item in enumerate(root.findall('.//item')):
         try:
-            # Handle missing or empty titles
+            # Handle title
             title = item.find('title').text if item.find('title') is not None else f"untitled_{i}"
-            if not title.strip():
-                title = f"untitled_{i}"
+            title = title.strip() if title else f"untitled_{i}"
 
-            # Handle missing or empty content
-            content = item.find('content:encoded', namespaces).text if item.find('content:encoded', namespaces) is not None else ""
-            if not content.strip():
-                content = "No content available."
+            # Handle content
+            content = item.find('content:encoded', namespaces).text if item.find('content:encoded', namespaces) is not None else "No content available."
 
-            # Sanitize the title for file naming
+            # Sanitize title
             sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
             if not sanitized_title:
                 sanitized_title = f"untitled_{i}"
 
-            # Create a .txt file for each post/page
+            # Create .txt file
             filename = f"{sanitized_title}.txt"
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(content)
 
             txt_files.append(filename)
+
         except Exception as e:
-            st.error(f"Error processing item {i}: {e}")
-            continue  # Skip problematic items and continue processing others
+            st.warning(f"Error processing item {i}: {e}")
+            continue  # Skip problematic items
 
     return txt_files
 
