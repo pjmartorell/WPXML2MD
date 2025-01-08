@@ -1,87 +1,68 @@
 import streamlit as st
 import xml.etree.ElementTree as ET
-import zipfile
 import os
+import zipfile
 from markdownify import markdownify as md
 
-def process_xml(file):
+def process_xml(uploaded_file, concatenate=False):
+    """Process the XML file and convert its content to Markdown."""
+    tree = ET.parse(uploaded_file)
+    root = tree.getroot()
+
+    namespace = {"wp": "http://wordpress.org/export/1.2/"}
+    items = root.findall("./channel/item")
     txt_files = []
+    concatenated_content = ""
 
-    # Parse the XML file
-    try:
-        tree = ET.parse(file)
-        root = tree.getroot()
-    except Exception as e:
-        st.error(f"Error parsing XML: {e}")
-        return []
+    for item in items:
+        title = item.find("title").text
+        content_encoded = item.find("wp:post_content", namespace)
+        content = content_encoded.text if content_encoded is not None else None
 
-    namespaces = {
-        'content': 'http://purl.org/rss/1.0/modules/content/'
-    }
+        if content is None:
+            continue  # Skip items with no content
 
-    for i, item in enumerate(root.findall('.//item')):
-        try:
-            # Handle title
-            title = item.find('title').text if item.find('title') is not None else f"untitled_{i}"
-            title = title.strip() if title else f"untitled_{i}"
+        # Sanitize the title for a valid filename
+        sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
+        filename = f"{sanitized_title}.md"
 
-            # Handle content
-            content = item.find('content:encoded', namespaces).text
-            if content is None:
-                # Skip items with no content
-                # st.warning(f"Skipping item {i}: Content is None")
-                continue
-
-            # Convert HTML to Markdown using markdownify
-            markdown_content = md(content, heading_style="ATX")  # Use ATX-style headings (#)
-
-            # Sanitize title
-            sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
-            if not sanitized_title:
-                sanitized_title = f"untitled_{i}"
-
-            # Create .md file
-            filename = f"{sanitized_title}.md"
+        # Convert HTML content to Markdown
+        markdown_content = md(content)
+        
+        if concatenate:
+            concatenated_content += f"# {title}\n\n{markdown_content}\n\n"
+        else:
             with open(filename, "w", encoding="utf-8") as f:
-                f.write(markdown_content)
-
+                f.write(f"# {title}\n\n{markdown_content}")
             txt_files.append(filename)
 
-        except Exception as e:
-            st.warning(f"Error processing item {i}: {e}")
-            continue  # Skip problematic items
+    if concatenate:
+        with open("all_pages.md", "w", encoding="utf-8") as f:
+            f.write(concatenated_content)
+        txt_files.append("all_pages.md")
 
     return txt_files
 
-# Streamlit UI
-st.title("XML to Markdown Converter")
 
-uploaded_file = st.file_uploader("Upload an XML file", type=["xml"])
+st.title("WordPress XML to Markdown Converter")
+
+uploaded_file = st.file_uploader("Upload your WordPress XML file", type=["xml"])
+concatenate = st.checkbox("Concatenate all Markdown files into a single file", value=False)
 
 if uploaded_file is not None:
-    txt_files = process_xml(uploaded_file)
+    txt_files = process_xml(uploaded_file, concatenate)
 
-    if txt_files:
-        # Create a zip archive of the .md files
-        with zipfile.ZipFile("output.zip", "w") as zipf:
-            for txt_file in txt_files:
-                if os.path.exists(txt_file):  # Check if the file exists
-                    zipf.write(txt_file)
-                else:
-                    st.warning(f"File not found: {txt_file}")
-
-        # Clean up individual .md files after zipping
+    # Create a zip archive of the .md files
+    with zipfile.ZipFile("output.zip", "w") as zipf:
         for txt_file in txt_files:
-            if os.path.exists(txt_file):
-                os.remove(txt_file)
+            zipf.write(txt_file)
+            os.remove(txt_file)  # Clean up individual .md files after zipping
 
-        # Provide download link
-        with open("output.zip", "rb") as f:
-            st.download_button(
-                label="Download ZIP file",
-                data=f,
-                file_name="output.zip",
-                mime="application/zip"
-            )
-
-        st.success("Conversion completed!")
+    # Download button for the zip archive
+    st.download_button(
+        label="Download Markdown Files (ZIP)",
+        data=open("output.zip", "rb").read(),
+        file_name="markdown_files.zip",
+        mime="application/zip"
+    )
+    os.remove("output.zip")  # Clean up the zip file after download
