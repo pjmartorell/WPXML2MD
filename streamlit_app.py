@@ -6,6 +6,7 @@ from markdownify import markdownify as md
 
 def process_xml(file):
     txt_files = []
+    concatenated_content = ""
 
     # Parse the XML file
     try:
@@ -13,7 +14,7 @@ def process_xml(file):
         root = tree.getroot()
     except Exception as e:
         st.error(f"Error parsing XML: {e}")
-        return []
+        return [], ""
 
     namespaces = {
         'content': 'http://purl.org/rss/1.0/modules/content/'
@@ -29,6 +30,7 @@ def process_xml(file):
             content = item.find('content:encoded', namespaces).text
             if content is None:
                 # Skip items with no content
+                st.warning(f"Skipping item {i}: Content is None")
                 continue
 
             # Convert HTML to Markdown using markdownify
@@ -39,46 +41,62 @@ def process_xml(file):
             if not sanitized_title:
                 sanitized_title = f"untitled_{i}"
 
-            # Create .md file
+            # Create .md file for individual files
             filename = f"{sanitized_title}.md"
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(markdown_content)
 
             txt_files.append(filename)
 
+            # Concatenate content if checkbox is checked
+            concatenated_content += f"\n\n# {title}\n\n{markdown_content}"
+
         except Exception as e:
             st.warning(f"Error processing item {i}: {e}")
             continue  # Skip problematic items
 
-    return txt_files
+    return txt_files, concatenated_content
 
 # Streamlit UI
 st.title("XML to Markdown Converter")
 
 uploaded_file = st.file_uploader("Upload an XML file", type=["xml"])
 
+# Option to concatenate all Markdown files
+concatenate_files = st.checkbox("Concatenate all Markdown files into a single file")
+
 if uploaded_file is not None:
-    txt_files = process_xml(uploaded_file)
+    txt_files, concatenated_content = process_xml(uploaded_file)
 
-    if txt_files:
-        # Create a zip archive of the .md files
-        with zipfile.ZipFile("output.zip", "w") as zipf:
-            for txt_file in txt_files:
-                if os.path.exists(txt_file):  # Check if the file exists
-                    zipf.write(txt_file)
-                else:
-                    st.warning(f"File not found: {txt_file}")
-
-        # Clean up individual .md files after zipping
+    # Create a zip archive of the .md files
+    with zipfile.ZipFile("output.zip", "w") as zipf:
+        # Add individual .md files to zip
         for txt_file in txt_files:
-            if os.path.exists(txt_file):
-                os.remove(txt_file)
+            if os.path.exists(txt_file):  # Check if the file exists
+                zipf.write(txt_file)
+            else:
+                st.warning(f"File not found: {txt_file}")
 
-        # Provide download link
-        with open("output.zip", "rb") as f:
-            st.download_button(
-                label="Download ZIP file",
-                data=f,
-                file_name="output.zip",
-                mime="application/zip"
-            )
+        # If concatenation is enabled, add the concatenated markdown to the zip
+        if concatenate_files and concatenated_content:
+            concatenated_filename = "concatenated_markdown.md"
+            with open(concatenated_filename, "w", encoding="utf-8") as f:
+                f.write(concatenated_content)
+            zipf.write(concatenated_filename)
+
+    # Clean up individual .md files and concatenated file after zipping
+    for txt_file in txt_files:
+        if os.path.exists(txt_file):
+            os.remove(txt_file)
+
+    if concatenate_files and os.path.exists("concatenated_markdown.md"):
+        os.remove("concatenated_markdown.md")
+
+    # Provide download link
+    with open("output.zip", "rb") as f:
+        st.download_button(
+            label="Download ZIP file",
+            data=f,
+            file_name="output.zip",
+            mime="application/zip"
+        )
