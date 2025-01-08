@@ -26,7 +26,9 @@ def process_xml(file):
             title = title.strip() if title else f"untitled_{i}"
 
             # Handle content
-            content = item.find('content:encoded', namespaces).text if item.find('content:encoded', namespaces) is not None else "No content available."
+            content = item.find('content:encoded', namespaces).text
+            if content is None:
+                content = "No content available."  # Default content if None
 
             # Sanitize title
             sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
