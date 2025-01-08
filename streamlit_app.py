@@ -32,11 +32,13 @@ def process_xml(uploaded_file, concatenate=False):
         if concatenate:
             concatenated_content += f"# {title}\n\n{markdown_content}\n\n"
         else:
+            # Write the content to an individual markdown file
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(f"# {title}\n\n{markdown_content}")
             txt_files.append(filename)
 
-    if concatenate:
+    if concatenate and concatenated_content:
+        # Write concatenated content to a single markdown file
         concatenated_filename = "all_pages.md"
         with open(concatenated_filename, "w", encoding="utf-8") as f:
             f.write(concatenated_content)
@@ -53,17 +55,20 @@ concatenate = st.checkbox("Concatenate all Markdown files into a single file", v
 if uploaded_file is not None:
     txt_files = process_xml(uploaded_file, concatenate)
 
-    # Create a zip archive of the .md files
-    with zipfile.ZipFile("output.zip", "w") as zipf:
-        for txt_file in txt_files:
-            zipf.write(txt_file)
-            os.remove(txt_file)  # Clean up individual .md files after zipping
+    if txt_files:  # Ensure there are files to process
+        # Create a zip archive of the .md files
+        with zipfile.ZipFile("output.zip", "w") as zipf:
+            for txt_file in txt_files:
+                zipf.write(txt_file)
+                os.remove(txt_file)  # Clean up individual .md files after zipping
 
-    # Download button for the zip archive
-    st.download_button(
-        label="Download Markdown Files (ZIP)",
-        data=open("output.zip", "rb").read(),
-        file_name="markdown_files.zip",
-        mime="application/zip"
-    )
-    os.remove("output.zip")  # Clean up the zip file after download
+        # Download button for the zip archive
+        st.download_button(
+            label="Download Markdown Files (ZIP)",
+            data=open("output.zip", "rb").read(),
+            file_name="markdown_files.zip",
+            mime="application/zip"
+        )
+        os.remove("output.zip")  # Clean up the zip file after download
+    else:
+        st.error("No valid content found in the XML file.")
