@@ -70,27 +70,20 @@ if uploaded_file is not None:
 
     # Create a zip archive of the .md files
     with zipfile.ZipFile("output.zip", "w") as zipf:
-        # Add individual .md files to zip
-        for txt_file in txt_files:
-            if os.path.exists(txt_file):  # Check if the file exists
-                zipf.write(txt_file)
-            else:
-                st.warning(f"File not found: {txt_file}")
-
-        # If concatenation is enabled, add the concatenated markdown to the zip
-        if concatenate_files and concatenated_content:
-            concatenated_filename = "concatenated_markdown.md"
-            with open(concatenated_filename, "w", encoding="utf-8") as f:
-                f.write(concatenated_content)
-            zipf.write(concatenated_filename)
-
-    # Clean up individual .md files and concatenated file after zipping
-    for txt_file in txt_files:
-        if os.path.exists(txt_file):
-            os.remove(txt_file)
-
-    if concatenate_files and os.path.exists("concatenated_markdown.md"):
-        os.remove("concatenated_markdown.md")
+        if concatenate_files:
+            # Add only the concatenated markdown to the zip
+            if concatenated_content:
+                concatenated_filename = "concatenated_markdown.md"
+                with open(concatenated_filename, "w", encoding="utf-8") as f:
+                    f.write(concatenated_content)
+                zipf.write(concatenated_filename)
+                os.remove(concatenated_filename)  # Clean up concatenated file
+        else:
+            # Add individual .md files to zip if concatenation is not enabled
+            for txt_file in txt_files:
+                if os.path.exists(txt_file):  # Check if the file exists
+                    zipf.write(txt_file)
+                    os.remove(txt_file)  # Clean up individual files after adding them to the zip
 
     # Provide download link
     with open("output.zip", "rb") as f:
