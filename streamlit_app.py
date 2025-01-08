@@ -8,26 +8,44 @@ def process_xml(file):
     txt_files = []
 
     # Parse the XML file
-    tree = ET.parse(file)
-    root = tree.getroot()
+    try:
+        tree = ET.parse(file)
+        root = tree.getroot()
+    except Exception as e:
+        st.error(f"Error parsing XML: {e}")
+        return []
+
     namespaces = {
         'content': 'http://purl.org/rss/1.0/modules/content/'
     }
 
     # Extract posts/pages
-    for item in root.findall('.//item'):
-        title = item.find('title').text if item.find('title') is not None else "untitled"
-        content = item.find('content:encoded', namespaces).text if item.find('content:encoded', namespaces) is not None else ""
+    for i, item in enumerate(root.findall('.//item')):
+        try:
+            # Handle missing or empty titles
+            title = item.find('title').text if item.find('title') is not None else f"untitled_{i}"
+            if not title.strip():
+                title = f"untitled_{i}"
 
-        # Sanitize the title for file naming
-        sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
+            # Handle missing or empty content
+            content = item.find('content:encoded', namespaces).text if item.find('content:encoded', namespaces) is not None else ""
+            if not content.strip():
+                content = "No content available."
 
-        # Create a .txt file for each post/page
-        filename = f"{sanitized_title}.txt"
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(content)
+            # Sanitize the title for file naming
+            sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
+            if not sanitized_title:
+                sanitized_title = f"untitled_{i}"
 
-        txt_files.append(filename)
+            # Create a .txt file for each post/page
+            filename = f"{sanitized_title}.txt"
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(content)
+
+            txt_files.append(filename)
+        except Exception as e:
+            st.error(f"Error processing item {i}: {e}")
+            continue  # Skip problematic items and continue processing others
 
     return txt_files
 
