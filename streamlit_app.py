@@ -27,7 +27,9 @@ def process_xml(file):
             # Handle content
             content = item.find('content:encoded', namespaces).text
             if content is None:
-                content = "No content available."  # Default content if None
+                # Skip items with no content
+                st.warning(f"Skipping item {i}: Content is None")
+                continue
 
             # Sanitize title
             sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
@@ -77,5 +79,5 @@ if uploaded_file is not None:
                 file_name="output.zip",
                 mime="application/zip"
             )
- 
+
         st.success("Conversion completed!")
