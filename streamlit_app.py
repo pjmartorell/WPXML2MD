@@ -64,8 +64,15 @@ if uploaded_file is not None:
     # Create a zip archive of the .txt files
     with zipfile.ZipFile("output.zip", "w") as zipf:
         for txt_file in txt_files:
-            zipf.write(txt_file)
-            os.remove(txt_file)  # Clean up individual .txt files after zipping
+            try:
+                # Ensure the file exists before adding it to the zip
+                if os.path.exists(txt_file):
+                    zipf.write(txt_file)
+                    os.remove(txt_file)  # Clean up individual .txt files after zipping
+                else:
+                    st.warning(f"File not found: {txt_file}")
+            except Exception as e:
+                st.error(f"Error adding file to zip: {txt_file}. Error: {e}")
 
     # Download button for the zip archive
     with open("output.zip", "rb") as f:
