@@ -41,20 +41,28 @@ def cleanup_output():
         except Exception as e:
             st.error(f"Error cleaning up {file_path}: {e}")
 
+def is_content_empty(content: str) -> bool:
+    """Check if markdown content is effectively empty"""
+    # Remove common markdown characters and whitespace
+    cleaned = content.replace('#', '').replace('-', '').replace('*', '').strip()
+    # Check if there's any meaningful content left
+    return not cleaned or cleaned.isspace()
+
 def process_xml(file):
     txt_files = []
     concatenated_content = ""
 
-    # Parse the XML file
     try:
-        # Cleanup before processing
         cleanup_output()
-
         tree = ET.parse(file)
         root = tree.getroot()
     except Exception as e:
         st.error(f"Error parsing XML: {e}")
         return [], ""
+
+    # Add counter for processed files
+    processed_count = 0
+    skipped_count = 0
 
     namespaces = {
         'content': 'http://purl.org/rss/1.0/modules/content/'
@@ -69,31 +77,42 @@ def process_xml(file):
             # Handle content
             content = item.find('content:encoded', namespaces).text
             if content is None:
-                # Skip items with no content
-                # st.warning(f"Skipping item {i}: Content is None")
                 continue
 
             # Convert HTML to Markdown using markdownify
-            markdown_content = md(content, heading_style="ATX")  # Use ATX-style headings (#)
+            markdown_content = md(content, heading_style="ATX")
+
+            # Enhanced empty content check
+            if is_content_empty(markdown_content):
+                skipped_count += 1
+                st.warning(f"Skipping empty content: {title}")
+                continue
 
             # Sanitize title
             sanitized_title = ''.join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
             if not sanitized_title:
                 sanitized_title = f"untitled_{i}"
 
-            # Save files to output directory
+            # Save non-empty files to output directory
             filename = os.path.join(OUTPUT_DIR, f"{sanitized_title}.md")
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(markdown_content)
 
             txt_files.append(filename)
+            processed_count += 1
 
-            # Concatenate content if checkbox is checked
+            # Only concatenate non-empty content
             concatenated_content += f"\n\n# {title}\n\n{markdown_content}"
 
         except Exception as e:
             st.warning(f"Error processing item {i}: {e}")
-            continue  # Skip problematic items
+            skipped_count += 1
+            continue
+
+    # Show processing summary
+    if processed_count > 0:
+        st.info(f"Successfully processed {processed_count} files" +
+                (f" (skipped {skipped_count} empty files)" if skipped_count > 0 else ""))
 
     return txt_files, concatenated_content
 
