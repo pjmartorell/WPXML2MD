@@ -295,6 +295,18 @@ if uploaded_files:
 
 # Footer
 st.markdown("---")
-st.markdown(
-    "Made with ❤️ by [pjmartorell](https://twitter.com/pjmartorell) • [View Source](https://github.com/pjmartorell/WPXML2MD) • [Support me](https://github.com/sponsors/pjmartorell)"
-)
+sponsor_html = """
+<div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+    <span>Made with ❤️ by <a href="https://twitter.com/pjmartorell">pjmartorell</a></span>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <a href="https://liberapay.com/pj.martorell/donate">
+            <img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg" height="32" style="border: 0;">
+        </a>
+        <span>•</span>
+        <iframe src="https://github.com/sponsors/pjmartorell/button" title="Sponsor pjmartorell" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
+        <span>•</span>
+        <a href='https://ko-fi.com/F1F818PV95' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+    </div>
+</div>
+"""
+st.markdown(sponsor_html, unsafe_allow_html=True)

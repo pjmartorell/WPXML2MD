@@ -51,4 +51,8 @@ Try it now at [wpxml2md.streamlit.app](https://wpxml2md.streamlit.app/)
 
 ## 💝 Support the Project
 
-If you find this tool useful, consider [sponsoring the project](https://github.com/sponsors/pjmartorell) to support its development.
+If you find this tool useful, consider supporting the project:
+
+- [![GitHub Sponsors](https://img.shields.io/github/sponsors/pjmartorell?label=Sponsor&logo=GitHub)](https://github.com/sponsors/pjmartorell)
+- [![Liberapay](https://img.shields.io/liberapay/receives/pj.martorell.svg?logo=liberapay)](https://liberapay.com/pj.martorell/donate)
+- [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/F1F818PV95)
