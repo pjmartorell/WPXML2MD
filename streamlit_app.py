@@ -13,6 +13,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
+        'Report a bug': 'https://wpxml2md.featurebase.app/',
         'About': '''
         Convert your WordPress export XML files to clean Markdown format.
 
@@ -20,6 +21,8 @@ st.set_page_config(
         [![Liberapay](https://img.shields.io/liberapay/receives/pj.martorell.svg?logo=liberapay)](https://liberapay.com/pj.martorell/donate)
 
         Made with ❤️ by [pjmartorell](https://github.com/pjmartorell)
+
+        Have feedback? Visit [wpxml2md.featurebase.app](https://wpxml2md.featurebase.app/)
         '''
     }
 )

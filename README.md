@@ -49,6 +49,10 @@ Try it now at [wpxml2md.streamlit.app](https://wpxml2md.streamlit.app/)
 - **Empty Content**: Skip posts/pages with no meaningful content
 - **Batch Processing**: Convert multiple XML files simultaneously
 
+## 🐛 Feedback & Bug Reports
+
+Have a feature request or found a bug? Share your feedback at [wpxml2md.featurebase.app](https://wpxml2md.featurebase.app/)
+
 ## 💝 Support the Project
 
 If you find this tool useful, consider supporting the project:
