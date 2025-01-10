@@ -26,7 +26,7 @@ st.set_page_config(
 
 # Sidebar with instructions and settings
 with st.sidebar:
-    st.title("⚙️ Settings & Help")
+    st.title("⚙️ Settings & How-To")
 
     with st.expander("📖 How to Use", expanded=True):
         st.markdown("""
