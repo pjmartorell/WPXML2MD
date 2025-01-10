@@ -51,7 +51,7 @@ st.title("📝 WordPress XML to Markdown")
 st.markdown("Convert your WordPress export XML files to clean Markdown files with ease!")
 
 # Create two columns for upload and options
-col1, col2 = st.columns([2, 1])
+col1, col2 = st.columns([2, 1], gap="medium")
 
 with col1:
     st.subheader("1️⃣ Upload Files")
