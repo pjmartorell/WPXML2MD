@@ -46,7 +46,7 @@ Try it now at [wpxml2md.streamlit.app](https://wpxml2md.streamlit.app/)
 
 - **Heading Styles**: Choose between ATX (#) or Setext (===) heading formats
 - **Line Breaks**: Option to preserve original WordPress line breaks
-- **Empty Posts**: Skip posts with no meaningful content
+- **Empty Content**: Skip posts/pages with no meaningful content
 - **Batch Processing**: Convert multiple XML files simultaneously
 
 ## 💝 Support the Project

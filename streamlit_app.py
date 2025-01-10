@@ -51,9 +51,9 @@ with st.sidebar:
         )
 
         remove_empty = st.checkbox(
-            "Skip Empty Posts",
+            "Skip Empty Content",
             value=True,
-            help="Skip posts with no meaningful content"
+            help="Skip posts/pages with no meaningful content"
         )
 
 # Main content area
@@ -80,7 +80,7 @@ with col2:
     concatenate_files = st.radio(
         "Choose output format",
         ["Individual Markdown Files", "Single Combined File"],
-        help="Choose how you want your posts to be organized"
+        help="Choose how you want your posts/pages to be organized"
     )
 
 # Create output directory if it doesn't exist
@@ -294,8 +294,8 @@ if uploaded_files:
                 with download_col2:
                     st.info("📊 Conversion Summary\n"
                            f"- Files Processed: {len(uploaded_files)}\n"
-                           f"- Posts Converted: {total_processed}\n"
-                           f"- Posts Skipped: {total_skipped}")
+                           f"- Contents Converted: {total_processed}\n"
+                           f"- Contents Skipped: {total_skipped}")
             else:
                 st.warning("⚠️ No content found to convert in the XML files.")
 
