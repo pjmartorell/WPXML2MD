@@ -11,7 +11,17 @@ st.set_page_config(
     page_title="WordPress XML to Markdown",
     page_icon="logo.png",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    menu_items={
+        'About': '''
+        Convert your WordPress export XML files to clean Markdown format.
+
+        [![GitHub](https://img.shields.io/github/sponsors/pjmartorell?label=Sponsor&logo=GitHub)](https://github.com/sponsors/pjmartorell)
+        [![Liberapay](https://img.shields.io/liberapay/receives/pj.martorell.svg?logo=liberapay)](https://liberapay.com/pj.martorell/donate)
+
+        Made with ❤️ by [pjmartorell](https://github.com/pjmartorell)
+        '''
+    }
 )
 
 # Sidebar with instructions and settings
