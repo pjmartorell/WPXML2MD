@@ -61,6 +61,15 @@
             animation: float-custom 8s ease-in-out infinite;
         }
     </style>
+    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+    <script>
+        kofiWidgetOverlay.draw('pjmartorell', {
+            'type': 'floating-chat',
+            'floating-chat.donateButton.text': 'Support the Project',
+            'floating-chat.donateButton.background-color': '#06b6d4',
+            'floating-chat.donateButton.text-color': '#fff'
+        });
+    </script>
 </head>
 <body class="bg-[#0A0A0F] text-text-primary overflow-x-hidden">
     <!-- Navbar -->
@@ -266,6 +275,44 @@
         </div>
     </section>
 
+    <!-- Support Section -->
+    <section class="py-20 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-dark-DEFAULT/50 to-transparent"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="max-w-3xl mx-auto text-center space-y-8">
+                <h3 class="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Support the Project</h3>
+                <p class="text-text-secondary text-lg">If you find WPXML2MD useful, consider supporting its development</p>
+
+                <div class="flex flex-wrap justify-center gap-4">
+                    <!-- GitHub Sponsor Button -->
+                    <a href="https://github.com/sponsors/pjmartorell"
+                       class="group relative px-6 py-3 bg-[#db61a2] hover:bg-[#bf4b8a] rounded-xl text-white font-semibold inline-flex items-center gap-2 transition transform hover:scale-105 hover:shadow-[0_0_15px_rgba(219,97,162,0.5)]">
+                        <i class="ti ti-heart text-2xl group-hover:scale-110 transition-transform"></i>
+                        <span>Sponsor on GitHub</span>
+                    </a>
+
+                    <!-- Ko-fi Button -->
+                    <a href="https://ko-fi.com/F1F818PV95"
+                       class="group relative px-6 py-3 bg-[#00b9fe] hover:bg-[#00a2e0] rounded-xl text-white font-semibold inline-flex items-center gap-2 transition transform hover:scale-105 hover:shadow-[0_0_15px_rgba(0,185,254,0.5)]">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                            <img src="logos/kofi.png" alt="Ko-fi" class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                        </div>
+                        <span>Buy me a coffee</span>
+                    </a>
+
+                    <!-- Liberapay Button -->
+                    <a href="https://liberapay.com/pjmartorell"
+                       class="group relative px-6 py-3 bg-[#f6c915] hover:bg-[#e1b700] rounded-xl text-[#1a171b] font-semibold inline-flex items-center gap-2 transition transform hover:scale-105 hover:shadow-[0_0_15px_rgba(246,201,21,0.5)]">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                            <img src="logos/liberapay.svg" alt="Liberapay" class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                        </div>
+                        <span>Donate on Liberapay</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="border-t border-primary/10 py-20">
         <div class="container mx-auto px-4">
@@ -299,26 +346,6 @@
                             </a>
                             <a href="https://github.com/pjmartorell" class="text-primary hover:text-primary-light transition">
                                 <i class="ti ti-brand-github text-3xl"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div>
-                        <h4 class="text-xl font-bold mb-4 text-text-primary">Support</h4>
-                        <div class="flex space-x-4">
-                            <a href="https://ko-fi.com/F1F818PV95"
-                               class="text-primary hover:text-primary-light transition"
-                               title="Support on Ko-fi">
-                                <i class="ti ti-coffee text-3xl"></i>
-                            </a>
-                            <a href="https://github.com/sponsors/pjmartorell"
-                               class="text-primary hover:text-primary-light transition"
-                               title="Become a GitHub Sponsor">
-                                <i class="ti ti-heart text-3xl"></i>
-                            </a>
-                            <a href="https://liberapay.com/pjmartorell"
-                               class="text-primary hover:text-primary-light transition"
-                               title="Donate on Liberapay">
-                                <i class="ti ti-coin text-3xl"></i>
                             </a>
                         </div>
                     </div>
