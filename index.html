@@ -11,7 +11,6 @@
 
     <!-- Preload critical resources -->
     <link rel="preload" href="/dist/output.css" as="style">
-    <link rel="preload" href="demo.webm" as="video" type="video/webm" fetchpriority="high">
     <link rel="preload" href="demo_poster.png" as="image" fetchpriority="high">
     <link rel="preload" href="logos/kofi.png" as="image">
     <link rel="preload" href="logos/liberapay.svg" as="image">
@@ -85,6 +84,28 @@
         @media (min-width: 768px) { .container { max-width: 768px; } }
         @media (min-width: 1024px) { .container { max-width: 1024px; } }
         @media (min-width: 1280px) { .container { max-width: 1280px; } }
+
+        /* Prevent CLS by reserving icon space */
+        .icon-space {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.125em;
+            line-height: 1;
+        }
+
+        /* Ensure icons maintain consistent size */
+        .ti {
+            font-display: swap;
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.125em;
+            display: inline-block;
+        }
+
+        .text-2xl .ti, .text-3xl .ti {
+            vertical-align: -0.225em;
+        }
     </style>
 </head>
 <body class="bg-[#0A0A0F] text-text-primary overflow-x-hidden">
