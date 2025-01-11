@@ -6,9 +6,27 @@
     <meta name="description" content="Convert your WordPress export XML files to clean Markdown files with ease!">
     <meta name="keywords" content="WordPress, XML, Markdown, Converter, WPXML2MD">
     <meta name="author" content="pjmartorell">
+    <meta name="theme-color" content="#0A0A0F">
+    <meta name="color-scheme" content="dark">
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/dist/output.css" as="style">
+    <link rel="preload" href="demo.webm" as="video" type="video/webm" fetchpriority="high">
+    <link rel="preload" href="demo_poster.png" as="image" fetchpriority="high">
+    <link rel="preload" href="logos/kofi.png" as="image">
+    <link rel="preload" href="logos/liberapay.svg" as="image">
+
+    <!-- Resource hints -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
     <title>WPXML2MD - WordPress XML to Markdown Converter</title>
+
+    <!-- Stylesheets -->
     <link href="/dist/output.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.28.0/dist/tabler-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.28.0/dist/tabler-icons.min.css" media="print" onload="this.media='all'">
+
+    <!-- Inline critical CSS -->
     <style>
         .gradient-blur {
             background: radial-gradient(circle at top right, rgba(6,182,212,0.15), transparent 70%),
@@ -60,16 +78,14 @@
         .float-custom {
             animation: float-custom 8s ease-in-out infinite;
         }
+
+        /* Add critical CSS for initial render */
+        .container { width: 100%; margin-left: auto; margin-right: auto; }
+        @media (min-width: 640px) { .container { max-width: 640px; } }
+        @media (min-width: 768px) { .container { max-width: 768px; } }
+        @media (min-width: 1024px) { .container { max-width: 1024px; } }
+        @media (min-width: 1280px) { .container { max-width: 1280px; } }
     </style>
-    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
-    <script>
-        kofiWidgetOverlay.draw('pjmartorell', {
-            'type': 'floating-chat',
-            'floating-chat.donateButton.text': 'Support the Project',
-            'floating-chat.donateButton.background-color': '#06b6d4',
-            'floating-chat.donateButton.text-color': '#fff'
-        });
-    </script>
 </head>
 <body class="bg-[#0A0A0F] text-text-primary overflow-x-hidden">
     <!-- Navbar -->
@@ -126,6 +142,9 @@
                                 loop
                                 muted
                                 playsinline
+                                loading="lazy"
+                                preload="auto"
+                                poster="demo_poster.png"
                             >
                                 <source src="demo.webm" type="video/webm">
                             </video>
@@ -295,7 +314,7 @@
                     <a href="https://ko-fi.com/F1F818PV95"
                        class="group relative px-6 py-3 bg-[#00b9fe] hover:bg-[#00a2e0] rounded-xl text-white font-semibold inline-flex items-center gap-2 transition transform hover:scale-105 hover:shadow-[0_0_15px_rgba(0,185,254,0.5)]">
                         <div class="w-5 h-5 flex items-center justify-center">
-                            <img src="logos/kofi.png" alt="Ko-fi" class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                            <img src="logos/kofi.png" alt="Ko-fi" class="w-full h-full object-contain group-hover:scale-110 transition-transform" loading="lazy" decoding="async" width="20" height="20" />
                         </div>
                         <span>Buy me a coffee</span>
                     </a>
@@ -304,7 +323,7 @@
                     <a href="https://liberapay.com/pjmartorell"
                        class="group relative px-6 py-3 bg-[#f6c915] hover:bg-[#e1b700] rounded-xl text-[#1a171b] font-semibold inline-flex items-center gap-2 transition transform hover:scale-105 hover:shadow-[0_0_15px_rgba(246,201,21,0.5)]">
                         <div class="w-5 h-5 flex items-center justify-center">
-                            <img src="logos/liberapay.svg" alt="Liberapay" class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                            <img src="logos/liberapay.svg" alt="Liberapay" class="w-full h-full object-contain group-hover:scale-110 transition-transform" loading="lazy" decoding="async" width="20" height="20" />
                         </div>
                         <span>Donate on Liberapay</span>
                     </a>
